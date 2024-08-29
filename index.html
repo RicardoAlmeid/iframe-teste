@@ -48,7 +48,7 @@
         }
 
         .column-title {
-            font-size: 1.8em;
+            font-size: 1.5em;
             font-weight: 500;
             margin-bottom: 20px;
             color: #333;
@@ -225,7 +225,11 @@
                 column.querySelectorAll('textarea').forEach(textarea => textarea.disabled = true);
                 column.querySelectorAll('.add-button').forEach(button => button.style.display = 'none');
                 column.querySelectorAll('.delete-button').forEach(button => button.style.display = 'none');
-                column.querySelectorAll('.like-button').forEach(button => button.style.display = 'none');
+                column.querySelectorAll('.like-button').forEach(button => {
+                    const likeCount = button.querySelector('.like-count');
+                    likeCount.style.cursor = 'default';
+                    button.onclick = null;
+                });
             }
         }
     </script>
