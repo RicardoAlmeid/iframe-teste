@@ -189,16 +189,18 @@
             const likeButton = document.createElement('div');
             likeButton.className = 'like-button';
             likeButton.innerHTML = '👍 <span class="like-count">0</span>';
-            likeButton.onclick = () => {
+            likeButton.onclick = (event) => {
                 const likeCount = likeButton.querySelector('.like-count');
                 likeCount.textContent = parseInt(likeCount.textContent) + 1;
+                event.stopPropagation();
             };
 
             const likeCount = likeButton.querySelector('.like-count');
-            likeCount.onclick = () => {
+            likeCount.onclick = (event) => {
                 if (parseInt(likeCount.textContent) > 0) {
                     likeCount.textContent = parseInt(likeCount.textContent) - 1;
                 }
+                event.stopPropagation();
             };
 
             card.appendChild(deleteButton);
@@ -218,7 +220,14 @@
                 column.querySelectorAll('textarea').forEach(textarea => textarea.disabled = false);
                 column.querySelectorAll('.add-button').forEach(button => button.style.display = 'block');
                 column.querySelectorAll('.delete-button').forEach(button => button.style.display = 'block');
-                column.querySelectorAll('.like-button').forEach(button => button.style.display = 'block');
+                column.querySelectorAll('.like-button').forEach(button => {
+                    const likeCount = button.querySelector('.like-count');
+                    likeCount.style.cursor = 'pointer';
+                    button.onclick = (event) => {
+                        likeCount.textContent = parseInt(likeCount.textContent) + 1;
+                        event.stopPropagation();
+                    };
+                });
             } else {
                 lockButton.classList.remove('fa-lock-open');
                 lockButton.classList.add('fa-lock');
