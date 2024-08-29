@@ -172,7 +172,38 @@
         </div>
     </div>
     <script>
-        function addCard(columnId, text = '') {
+        document.addEventListener('DOMContentLoaded', () => {
+            loadFromLocalStorage();
+        });
+
+        function saveToLocalStorage() {
+            const columns = ['column1', 'column2', 'column3'];
+            const data = columns.map(columnId => {
+                const column = document.getElementById(columnId);
+                const cards = Array.from(column.getElementsByClassName('card')).map(card => {
+                    return {
+                        text: card.querySelector('textarea').value,
+                        likes: parseInt(card.querySelector('.like-count').textContent)
+                    };
+                });
+                return { columnId, cards };
+            });
+            localStorage.setItem('retroBoardData', JSON.stringify(data));
+        }
+
+        function loadFromLocalStorage() {
+            const data = JSON.parse(localStorage.getItem('retroBoardData'));
+            if (data) {
+                data.forEach(columnData => {
+                    const column = document.getElementById(columnData.columnId);
+                    columnData.cards.forEach(cardData => {
+                        addCard(columnData.columnId, cardData.text, cardData.likes);
+                    });
+                });
+            }
+        }
+
+        function addCard(columnId, text = '', likes = 0) {
             const column = document.getElementById(columnId);
             const card = document.createElement('div');
             card.className = 'card';
@@ -180,33 +211,38 @@
             const deleteButton = document.createElement('div');
             deleteButton.className = 'delete-button';
             deleteButton.innerHTML = '❌';
-            deleteButton.onclick = () => card.remove();
+            deleteButton.onclick = () => {
+                card.remove();
+                saveToLocalStorage();
+            };
 
             const textarea = document.createElement('textarea');
             textarea.rows = 3;
             textarea.value = text;
+            textarea.oninput = saveToLocalStorage;
 
             const likeButton = document.createElement('div');
             likeButton.className = 'like-button';
-            likeButton.innerHTML = '👍 <span class="like-count">0</span>';
-            likeButton.onclick = (event) => {
+            likeButton.innerHTML = `👍 <span class="like-count">${likes}</span>`;
+            likeButton.onclick = () => {
                 const likeCount = likeButton.querySelector('.like-count');
                 likeCount.textContent = parseInt(likeCount.textContent) + 1;
-                event.stopPropagation();
+                saveToLocalStorage();
             };
 
             const likeCount = likeButton.querySelector('.like-count');
-            likeCount.onclick = (event) => {
+            likeCount.onclick = () => {
                 if (parseInt(likeCount.textContent) > 0) {
                     likeCount.textContent = parseInt(likeCount.textContent) - 1;
+                    saveToLocalStorage();
                 }
-                event.stopPropagation();
             };
 
             card.appendChild(deleteButton);
             card.appendChild(textarea);
             card.appendChild(likeButton);
             column.appendChild(card);
+            saveToLocalStorage();
         }
 
         function toggleLock(columnId) {
@@ -223,9 +259,9 @@
                 column.querySelectorAll('.like-button').forEach(button => {
                     const likeCount = button.querySelector('.like-count');
                     likeCount.style.cursor = 'pointer';
-                    button.onclick = (event) => {
+                    button.onclick = () => {
                         likeCount.textContent = parseInt(likeCount.textContent) + 1;
-                        event.stopPropagation();
+                        saveToLocalStorage();
                     };
                 });
             } else {
