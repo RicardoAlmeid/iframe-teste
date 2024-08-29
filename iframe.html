@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Escala de Esforço</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+        .title {
+            font-size: 2em;
+            font-weight: bold;
+            margin-bottom: 20px;
+        }
+        .slider-container {
+            width: 100%;
+            max-width: 800px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 20px;
+        }
+        .name {
+            font-size: 1.2em;
+            margin-right: 10px;
+            white-space: nowrap;
+            width: 100px; /* Define a largura fixa */
+            text-align: center; /* Centraliza o texto */
+        }
+        .slider-wrapper {
+            display: flex;
+            align-items: center;
+            width: 500px;
+        }
+        .slider {
+            flex-grow: 1;
+            margin: 0 10px;
+        }
+        .value {
+            font-size: 2em;
+            margin-left: 10px;
+        }
+        .add-button {
+            font-size: 2em;
+            cursor: pointer;
+            margin-top: 20px;
+        }
+        .delete-button {
+            font-size: 1.2em;
+            cursor: pointer;
+            margin-right: 10px;
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <div class="title">Escala de esforço</div>
+    <div id="sliders">
+        <div class="slider-container" id="slider0">
+            <div class="delete-button" id="delete0">X</div>
+            <div class="name" id="name0">Ricardo</div>
+            <div class="slider-wrapper">
+                <input type="range" min="0" max="9" value="0" class="slider" id="effortSlider0">
+                <div class="value" id="emojiValue0">➖</div>
+            </div>
+        </div>
+    </div>
+    <div class="add-button" id="addButton">+</div>
+
+    <script>
+        const emojis = ["😴", "🥱", "😒", "😓", "😎", "😥", "😟", "😩", "😨", "🥵"];
+        let sliderCount = 1;
+
+        function formatName(name) {
+            if (name.length > 10) {
+                return name.substring(0, 10); // Trunca o nome se for maior que 10 caracteres
+            } else {
+                return name.padEnd(10, ' '); // Preenche com espaços se for menor que 10 caracteres
+            }
+        }
+
+        function createSlider(id, name) {
+            const sliderContainer = document.createElement('div');
+            sliderContainer.className = 'slider-container';
+            sliderContainer.id = `slider${id}`;
+
+            const deleteButton = document.createElement('div');
+            deleteButton.className = 'delete-button';
+            deleteButton.id = `delete${id}`;
+            deleteButton.textContent = 'X';
+            deleteButton.addEventListener('click', function() {
+                document.getElementById(`slider${id}`).remove();
+            });
+
+            const nameDiv = document.createElement('div');
+            nameDiv.className = 'name';
+            nameDiv.id = `name${id}`;
+            nameDiv.textContent = formatName(name);
+
+            const sliderWrapper = document.createElement('div');
+            sliderWrapper.className = 'slider-wrapper';
+
+            const slider = document.createElement('input');
+            slider.type = 'range';
+            slider.min = '0';
+            slider.max = '9';
+            slider.value = '0'; // Valor inicial definido como 0
+            slider.className = 'slider';
+            slider.id = `effortSlider${id}`;
+
+            const valueDiv = document.createElement('div');
+            valueDiv.className = 'value';
+            valueDiv.id = `emojiValue${id}`;
+            valueDiv.textContent = '➖';
+
+            slider.addEventListener('input', function() {
+                valueDiv.textContent = emojis[slider.value];
+            });
+
+            sliderWrapper.appendChild(slider);
+            sliderWrapper.appendChild(valueDiv);
+
+            sliderContainer.appendChild(deleteButton);
+            sliderContainer.appendChild(nameDiv);
+            sliderContainer.appendChild(sliderWrapper);
+
+            return sliderContainer;
+        }
+
+        document.getElementById('addButton').addEventListener('click', function() {
+            const name = prompt("Digite o nome do colaborador:");
+            if (name) {
+                const newSlider = createSlider(sliderCount, name);
+                document.getElementById('sliders').appendChild(newSlider);
+                sliderCount++;
+            }
+        });
+
+        // Initialize the first slider
+        document.getElementById('effortSlider0').addEventListener('input', function() {
+            document.getElementById('emojiValue0').textContent = emojis[this.value];
+        });
+
+        document.getElementById('delete0').addEventListener('click', function() {
+            document.getElementById('slider0').remove();
+        });
+    </script>
+</body>
+</html>
